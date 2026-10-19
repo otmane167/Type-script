@@ -1,5 +1,5 @@
 import { WizardRepository, SpellRepository } from "./repository";
-import { Cache } from "./decorators";
+import { Cache, Log, MeasureTime } from "./decorators";
 import type { SpellCastEvent, House, Wizard } from "./types";
 
 // Exercises 1 and 2
@@ -27,6 +27,8 @@ console.log(spells.getAll().length);
 
 // Exercise 5
 class SpellCalculator {
+  @Log
+  @MeasureTime
   @Cache
   calculatePower(basePower: number, multiplier: number): number {
     console.log("Calculating...");

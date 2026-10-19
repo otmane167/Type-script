@@ -1,11 +1,72 @@
+/**
+ * Legacy TypeScript method decorators.
+ * Enable "experimentalDecorators": true in tsconfig.json.
+ */
+export function Log(
+  target: object,
+  propertyKey: string | symbol,
+  descriptor: PropertyDescriptor
+): void {
+  const originalMethod = descriptor.value as (
+    ...args: unknown[]
+  ) => unknown;
+
+  descriptor.value = function (
+    this: unknown,
+    ...args: unknown[]
+  ): unknown {
+    console.log(`[CALL] ${String(propertyKey)}`, args);
+
+    try {
+      const result = originalMethod.apply(this, args);
+      console.log(`[RETURN] ${String(propertyKey)}`, result);
+      return result;
+    } catch (error: unknown) {
+      console.error(`[ERROR] ${String(propertyKey)}`, error);
+      throw error;
+    }
+  };
+}
+
+export function MeasureTime(
+  target: object,
+  propertyKey: string | symbol,
+  descriptor: PropertyDescriptor
+): void {
+  const originalMethod = descriptor.value as (
+    ...args: unknown[]
+  ) => unknown;
+
+  descriptor.value = function (
+    this: unknown,
+    ...args: unknown[]
+  ): unknown {
+    const start = Date.now();
+
+    try {
+      return originalMethod.apply(this, args);
+    } finally {
+      console.log(
+        `[TIME] ${String(propertyKey)}: ${Date.now() - start} ms`
+      );
+    }
+  };
+}
+
+// Exercise 4
 export function ValidateSpellPower(
   target: object,
   propertyKey: string | symbol,
   descriptor: PropertyDescriptor
 ): void {
-  const originalMethod = descriptor.value as (...args: unknown[]) => unknown;
+  const originalMethod = descriptor.value as (
+    ...args: unknown[]
+  ) => unknown;
 
-  descriptor.value = function (this: unknown, ...args: unknown[]): unknown {
+  descriptor.value = function (
+    this: unknown,
+    ...args: unknown[]
+  ): unknown {
     const candidate: unknown = args[0];
 
     if (
@@ -22,15 +83,22 @@ export function ValidateSpellPower(
   };
 }
 
+// Exercise 5
 export function Cache(
   target: object,
   propertyKey: string | symbol,
   descriptor: PropertyDescriptor
 ): void {
-  const originalMethod = descriptor.value as (...args: unknown[]) => unknown;
+  const originalMethod = descriptor.value as (
+    ...args: unknown[]
+  ) => unknown;
+
   const instanceCaches = new WeakMap<object, Map<string, unknown>>();
 
-  descriptor.value = function (this: object, ...args: unknown[]): unknown {
+  descriptor.value = function (
+    this: object,
+    ...args: unknown[]
+  ): unknown {
     let cache = instanceCaches.get(this);
     if (!cache) {
       cache = new Map<string, unknown>();
